@@ -1,0 +1,8 @@
+Set these environment variables before running the app if you want real welcome emails.
+
+Windows PowerShell example:
+$env:SMTP_HOST="smtp.gmail.com"
+$env:SMTP_PORT="587"
+$env:SMTP_USER="your_email@gmail.com"
+$env:SMTP_PASS="your_app_password"
+python run_app.py

@@ -1,0 +1,505 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Math Solver Studio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#0b1220; --bg2:#111827; --card:#111827; --line:#263245; --soft:#1f2937;
+      --text:#e5eef8; --muted:#95a3b8; --accent:#60a5fa; --accent2:#22c55e; --danger:#ef4444;
+      --shadow:0 16px 40px rgba(0,0,0,.22);
+      --radius:20px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:linear-gradient(180deg,var(--bg),#0d1528 45%, #0b1220);color:var(--text)}
+    .shell{max-width:1200px;margin:0 auto;padding:24px}
+    .auth,.app{min-height:100vh}
+    .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:center;padding-top:24px}
+    .heroCard,.loginCard,.panel,.sidebar{background:rgba(17,24,39,.94);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .heroCard{padding:32px}
+    h1{font-size:48px;line-height:1.05;margin:0 0 12px}
+    .sub{color:var(--muted);font-size:18px;line-height:1.6}
+    .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+    .chip{padding:10px 14px;border:1px solid var(--line);border-radius:999px;background:#0c1528;color:#b9c7da;font-size:14px}
+    .loginCard{padding:28px}
+    .field{margin:10px 0}
+    .label{display:block;color:#c9d6e7;font-size:14px;margin-bottom:6px}
+    .input,.select,.textarea{width:100%;padding:14px 16px;border-radius:14px;border:1px solid #334155;background:#0a1323;color:var(--text);font-size:15px}
+    .textarea{min-height:120px;resize:vertical}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .btn{border:none;border-radius:14px;padding:13px 18px;font-weight:700;cursor:pointer}
+    .btn.primary{background:linear-gradient(135deg,#3b82f6,#2563eb);color:white}
+    .btn.secondary{background:#182235;color:var(--text);border:1px solid #334155}
+    .btn.ghost{background:transparent;color:#bfd4f5;border:1px dashed #35507a}
+    .btn.small{padding:10px 12px;font-size:14px}
+    .toggle{margin-top:14px;color:#c4d2e7;font-size:14px}
+    .toggle span{color:#8cc0ff;cursor:pointer;font-weight:700}
+    .status{min-height:24px;margin-top:10px;font-size:14px}
+    .ok{color:#34d399}.err{color:#f87171}.info{color:#9ec5ff}
+    .meter{height:8px;border-radius:999px;background:#10192b;margin-top:10px;overflow:hidden}
+    .meterFill{height:100%;width:0;background:linear-gradient(90deg,#ef4444,#f59e0b,#22c55e);transition:width .2s}
+    .rules{font-size:13px;color:#9fb0c9;margin-top:8px}
+    .hidden{display:none !important}
+
+    .appWrap{display:grid;grid-template-columns:300px 1fr;gap:20px;padding-top:20px}
+    .sidebar{padding:20px;position:sticky;top:16px;height:calc(100vh - 32px);overflow:auto}
+    .brand{font-size:28px;font-weight:800;margin-bottom:6px}
+    .mini{color:var(--muted);font-size:14px;line-height:1.5}
+    .userBox{margin-top:18px;padding:14px;border-radius:16px;background:#0d1728;border:1px solid var(--line)}
+    .sideActions{display:grid;gap:10px;margin-top:20px}
+    .historyList{margin-top:14px;display:grid;gap:10px}
+    .historyItem{padding:12px;border-radius:14px;background:#0d1728;border:1px solid var(--line);font-size:13px;color:#d2deee}
+    .historyItem strong{display:block;margin-bottom:6px}
+    .main{display:grid;gap:18px;min-width:0}
+    .topbar{display:flex;justify-content:space-between;gap:12px;align-items:center}
+    .badge{padding:9px 12px;border-radius:999px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.35);color:#b7f5cc;font-size:14px}
+    .tabs{display:flex;gap:10px;flex-wrap:wrap}
+    .tab{padding:12px 16px;border-radius:999px;background:#182235;border:1px solid #334155;cursor:pointer;color:#d1def0}
+    .tab.active{background:#1d4ed8;border-color:#1d4ed8;color:white}
+    .panel{padding:22px}
+    .sectionTitle{font-size:22px;font-weight:800;margin:0 0 8px}
+    .muted{color:var(--muted);font-size:14px;line-height:1.5}
+    .methodTabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+    .method{padding:10px 14px;border-radius:999px;background:#0d1728;border:1px solid var(--line);cursor:pointer;font-size:14px}
+    .method.active{background:#15315a;border-color:#2e5da1}
+    .plainGuide{background:#0d1728;border:1px solid var(--line);padding:14px;border-radius:16px;margin-top:14px;color:#d4e1f2}
+    .steps{display:grid;gap:12px;margin-top:14px}
+    .step{padding:16px;border-radius:16px;background:#0d1728;border:1px solid var(--line)}
+    .stepNum{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:999px;background:#1d4ed8;color:white;font-weight:800;margin-right:10px}
+    .answerBox{padding:18px;border-radius:18px;background:linear-gradient(180deg,#102034,#12263c);border:1px solid #284665}
+    .answerLabel{color:#9fb9d8;font-size:12px;text-transform:uppercase;letter-spacing:1.1px}
+    .answerText{font-size:28px;font-weight:800;margin-top:8px}
+    .beginnerNote{color:#c9d6e7;margin-top:12px;line-height:1.6}
+    .practiceCard{display:grid;gap:16px}
+    .questionCard{padding:18px;border-radius:18px;background:#0d1728;border:1px solid var(--line)}
+    .questionBig{font-size:26px;font-weight:700;line-height:1.45}
+    .feedback{padding:14px;border-radius:16px;background:#0d1728;border:1px solid var(--line);line-height:1.6}
+    .helper{font-size:14px;color:var(--muted)}
+    .footerNote{font-size:13px;color:#9fb0c9}
+    .split{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+    @media (max-width: 980px){
+      .hero,.appWrap,.split{grid-template-columns:1fr}
+      .sidebar{position:static;height:auto}
+      h1{font-size:36px}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell auth" id="authView">
+    <div class="hero">
+      <section class="heroCard">
+        <h1>Math Solver Studio</h1>
+        <div class="sub">A cleaner learning website where you can ask, practise, speak, upload, and understand each step in simple language.</div>
+        <div class="chips">
+          <div class="chip">Strong password rules</div>
+          <div class="chip">Welcome email support</div>
+          <div class="chip">Voice input</div>
+          <div class="chip">Unlimited practice generation</div>
+          <div class="chip">Beginner-friendly explanations</div>
+        </div>
+      </section>
+      <section class="loginCard">
+        <div class="sectionTitle" id="authTitle">Login</div>
+        <div class="muted" id="authSub">Login to open your workspace.</div>
+        <div class="field hidden" id="nameField">
+          <label class="label">Username</label>
+          <input id="regName" class="input" placeholder="Enter your name" />
+        </div>
+        <div class="field">
+          <label class="label">Email</label>
+          <input id="authEmail" class="input" type="email" placeholder="name@example.com" />
+        </div>
+        <div class="field">
+          <label class="label">Password</label>
+          <input id="authPassword" class="input" type="password" placeholder="Enter password" />
+          <div id="passwordBox" class="hidden">
+            <div class="meter"><div class="meterFill" id="meterFill"></div></div>
+            <div class="rules">Use at least 8 characters and include uppercase, lowercase, a number, and a special character.</div>
+          </div>
+        </div>
+        <button class="btn primary" id="authBtn">Login</button>
+        <div class="toggle" id="toggleText">New user? <span id="toggleMode">Create account</span></div>
+        <div class="status info" id="authStatus"></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="shell app hidden" id="appView">
+    <div class="appWrap">
+      <aside class="sidebar">
+        <div class="brand">Math AI</div>
+        <div class="mini">One calm workspace. Ask a question, practise one question at a time, and review what you solved.</div>
+        <div class="userBox" id="userChip"></div>
+        <div class="sideActions">
+          <button class="btn secondary small" id="refreshHistoryBtn">Refresh history</button>
+          <button class="btn secondary small" id="clearHistoryBtn">Clear history</button>
+          <button class="btn secondary small" id="logoutBtn">Logout</button>
+        </div>
+        <div style="margin-top:20px" class="sectionTitle">Recent history</div>
+        <div class="historyList" id="historyList"></div>
+      </aside>
+
+      <main class="main">
+        <div class="topbar">
+          <div>
+            <div class="sectionTitle" style="margin:0">Learning workspace</div>
+            <div class="muted">Choose one task and work through it step by step.</div>
+          </div>
+          <div class="badge" id="healthBadge">Checking API...</div>
+        </div>
+
+        <div class="tabs">
+          <div class="tab active" data-tab="ask">Ask a question</div>
+          <div class="tab" data-tab="practice">Practice mode</div>
+          <div class="tab" data-tab="tips">How to use it</div>
+        </div>
+
+        <section class="panel" id="askTab">
+          <div class="sectionTitle">Ask your own question</div>
+          <div class="muted">Pick one input method, enter one problem, and get a gentle explanation.</div>
+          <div class="methodTabs">
+            <div class="method active" data-method="type">Type</div>
+            <div class="method" data-method="voice">Voice</div>
+            <div class="method" data-method="upload">Upload text file</div>
+          </div>
+          <div class="plainGuide">Best examples: <strong>solve 2x + 5 = 15</strong>, <strong>expand (x + 2)(x + 3)</strong>, <strong>factorize x^2 + 5x + 6</strong>, <strong>differentiate x^2 + 3x + 2</strong>.</div>
+          <div class="field" id="typeArea">
+            <label class="label">Question</label>
+            <textarea id="questionInput" class="textarea" placeholder="Type one clear math question here"></textarea>
+          </div>
+          <div class="field hidden" id="voiceArea">
+            <label class="label">Voice input</label>
+            <div class="row">
+              <button class="btn secondary" id="voiceBtn">Start listening</button>
+              <button class="btn ghost" id="stopVoiceBtn">Stop</button>
+            </div>
+            <div class="plainGuide">Say your question clearly. The recognized text will appear in the question box.</div>
+          </div>
+          <div class="field hidden" id="uploadArea">
+            <label class="label">Upload a .txt file</label>
+            <input id="uploadInput" type="file" accept=".txt" class="input" />
+            <div class="plainGuide">Only one text question file at a time. The file content will be placed in the question box.</div>
+          </div>
+          <div class="row">
+            <button class="btn primary" id="solveBtn">Solve question</button>
+            <button class="btn secondary" id="clearBtn">Clear</button>
+          </div>
+          <div class="status info" id="solveStatus"></div>
+
+          <div class="split" style="margin-top:18px;">
+            <div class="panel" style="padding:18px;">
+              <div class="sectionTitle" style="font-size:20px">Step-by-step explanation</div>
+              <div class="muted">Each step is written in simple language.</div>
+              <div id="stepsArea" class="steps">
+                <div class="helper">Solve one question to see the explanation here.</div>
+              </div>
+            </div>
+            <div class="panel" style="padding:18px;">
+              <div class="answerBox">
+                <div class="answerLabel">Final answer</div>
+                <div class="answerText" id="finalAnswer">—</div>
+                <div class="beginnerNote" id="beginnerNote">A very simple note for beginners will appear here.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="practiceTab">
+          <div class="sectionTitle">Practice one question at a time</div>
+          <div class="muted">Generate a fresh question whenever you want. The generator is not limited to a tiny fixed list.</div>
+          <div class="row" style="margin-top:12px">
+            <select id="topicSelect" class="select">
+              <option>Linear Equations</option>
+              <option>Expansion</option>
+              <option>Factorization</option>
+              <option>Simultaneous Equations</option>
+              <option>Calculus</option>
+            </select>
+            <select id="difficultySelect" class="select">
+              <option>Easy</option>
+              <option>Medium</option>
+              <option>Hard</option>
+            </select>
+            <button class="btn primary" id="generatePracticeBtn">Generate next question</button>
+          </div>
+
+          <div class="practiceCard" style="margin-top:18px;">
+            <div class="questionCard">
+              <div class="label">Current question</div>
+              <div id="practiceQuestion" class="questionBig">No practice question generated yet.</div>
+              <div id="practiceMeta" class="helper" style="margin-top:10px">Choose topic and difficulty, then generate one question.</div>
+            </div>
+
+            <div class="row">
+              <input id="practiceAnswerInput" class="input" placeholder="Type your answer here" />
+              <button class="btn primary" id="checkPracticeBtn">Check answer</button>
+            </div>
+
+            <div id="practiceStatus" class="status info"></div>
+            <div id="practiceFeedback" class="feedback">Feedback will appear here after you check your answer.</div>
+
+            <div class="panel" style="padding:18px;">
+              <div class="sectionTitle" style="font-size:20px">Worked solution</div>
+              <div class="muted">If your answer is wrong, read this slowly and compare each step with your own work.</div>
+              <div id="practiceWorked" class="steps" style="margin-top:14px"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="tipsTab">
+          <div class="sectionTitle">How to get the best output</div>
+          <div class="plainGuide">
+            <strong>1.</strong> Write one clear question at a time.<br><br>
+            <strong>2.</strong> Start with words like solve, simplify, expand, factorize, differentiate, integrate, or evaluate.<br><br>
+            <strong>3.</strong> In practice mode, try the answer yourself first. Then read the worked solution slowly if you need help.<br><br>
+            <strong>4.</strong> Use history to revise earlier questions.
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+<script>
+const API = "";
+const tokenKey = "mss_token";
+const userKey = "mss_user";
+let signupMode = false;
+let practiceCurrent = null;
+let recognition = null;
+const $ = id => document.getElementById(id);
+
+function setStatus(id, text, kind="info"){
+  const el = $(id);
+  el.textContent = text;
+  el.className = "status " + kind;
+}
+function validEmail(email){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+function passwordStrong(pw){ return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(pw); }
+function passwordScore(pw){
+  let score = 0;
+  if (pw.length >= 8) score += 25;
+  if (/[A-Z]/.test(pw)) score += 20;
+  if (/[a-z]/.test(pw)) score += 20;
+  if (/\d/.test(pw)) score += 20;
+  if (/[^A-Za-z0-9]/.test(pw)) score += 15;
+  return Math.min(score, 100);
+}
+function setMode(signup){
+  signupMode = signup;
+  $("nameField").classList.toggle("hidden", !signup);
+  $("passwordBox").classList.toggle("hidden", !signup);
+  $("authTitle").textContent = signup ? "Create account" : "Login";
+  $("authSub").textContent = signup ? "Create your account to open the workspace." : "Login to open your workspace.";
+  $("authBtn").textContent = signup ? "Create account" : "Login";
+  $("toggleText").innerHTML = signup ? 'Already have an account? <span id="toggleMode">Login</span>' : 'New user? <span id="toggleMode">Create account</span>';
+  $("toggleMode").onclick = () => setMode(!signupMode);
+  setStatus("authStatus", "", "info");
+}
+async function doAuth(){
+  const email = $("authEmail").value.trim();
+  const password = $("authPassword").value;
+  if (!validEmail(email)){ setStatus("authStatus","Please enter a valid email address.","err"); return; }
+
+  if (signupMode){
+    const username = $("regName").value.trim();
+    if (username.length < 2){ setStatus("authStatus","Username should have at least 2 characters.","err"); return; }
+    if (!passwordStrong(password)){ setStatus("authStatus","Password must contain uppercase, lowercase, number, special character, and be at least 8 characters long.","err"); return; }
+    try{
+      const res = await fetch(API + "/register", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({username, email, password})
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Registration failed");
+      setStatus("authStatus", data.welcome_email_sent ? "Registration successful. Welcome email sent. Please login now." : "Registration successful. Please login now.", "ok");
+      setMode(false);
+    }catch(e){ setStatus("authStatus", e.message || String(e), "err"); }
+  } else {
+    try{
+      const res = await fetch(API + "/login", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({email, password})
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Login failed");
+      localStorage.setItem(tokenKey, data.access_token);
+      localStorage.setItem(userKey, JSON.stringify({username:data.username, email:data.email}));
+      openApp();
+    }catch(e){ setStatus("authStatus", e.message || String(e), "err"); }
+  }
+}
+function renderSteps(containerId, steps){
+  const box = $(containerId);
+  box.innerHTML = "";
+  if (!steps || !steps.length){ box.innerHTML = '<div class="helper">No steps available.</div>'; return; }
+  steps.forEach((s, i) => {
+    const div = document.createElement("div");
+    div.className = "step";
+    div.innerHTML = `<div><span class="stepNum">${i+1}</span><strong>Step ${i+1}</strong></div><div style="margin-top:10px;line-height:1.7">${s}</div>`;
+    box.appendChild(div);
+  });
+}
+function openApp(){
+  $("authView").classList.add("hidden");
+  $("appView").classList.remove("hidden");
+  const user = JSON.parse(localStorage.getItem(userKey) || "{}");
+  $("userChip").innerHTML = `<strong>${user.username || ""}</strong><div class="mini" style="margin-top:6px">${user.email || ""}</div>`;
+  loadHistory();
+  checkHealth();
+}
+function logout(){
+  localStorage.removeItem(tokenKey);
+  localStorage.removeItem(userKey);
+  $("appView").classList.add("hidden");
+  $("authView").classList.remove("hidden");
+}
+async function apiFetch(path, options={}){
+  const token = localStorage.getItem(tokenKey);
+  const headers = Object.assign({}, options.headers || {});
+  if (token) headers["Authorization"] = "Bearer " + token;
+  const res = await fetch(API + path, Object.assign({}, options, {headers}));
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.detail || "Request failed");
+  return data;
+}
+async function solveQuestion(){
+  const question = $("questionInput").value.trim();
+  if (!question){ setStatus("solveStatus","Please enter one question first.","err"); return; }
+  try{
+    setStatus("solveStatus","Solving...","info");
+    const data = await apiFetch("/solve", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({question})
+    });
+    renderSteps("stepsArea", data.steps || []);
+    $("finalAnswer").textContent = data.answer || "—";
+    $("beginnerNote").textContent = data.beginner_note || "";
+    setStatus("solveStatus","Solved successfully.","ok");
+    loadHistory();
+  }catch(e){ setStatus("solveStatus", e.message || String(e), "err"); }
+}
+async function loadHistory(){
+  try{
+    const data = await apiFetch("/history");
+    const box = $("historyList");
+    box.innerHTML = "";
+    if (!data.length){ box.innerHTML = '<div class="helper">No questions yet.</div>'; return; }
+    data.slice(0, 8).forEach(item => {
+      const div = document.createElement("div");
+      div.className = "historyItem";
+      div.innerHTML = `<strong>${item.question}</strong><div>${item.answer}</div>`;
+      box.appendChild(div);
+    });
+  }catch(e){ $("historyList").innerHTML = '<div class="helper">Could not load history.</div>'; }
+}
+async function clearHistory(){
+  try{
+    await apiFetch("/history", {method:"DELETE"});
+    loadHistory();
+  }catch(e){}
+}
+async function checkHealth(){
+  try{
+    const res = await fetch(API + "/api/health");
+    const data = await res.json();
+    $("healthBadge").textContent = data.status === "ok" ? "API healthy" : "API issue";
+  }catch(e){ $("healthBadge").textContent = "API offline"; }
+}
+async function generatePractice(){
+  try{
+    const topic = $("topicSelect").value;
+    const difficulty = $("difficultySelect").value;
+    const data = await apiFetch("/practice/question", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({topic, difficulty})
+    });
+    practiceCurrent = {topic, difficulty, question:data.question, expected_answer:data.expected_answer};
+    $("practiceQuestion").textContent = data.question;
+    $("practiceMeta").textContent = `${topic} • ${difficulty} • Fresh question generated`;
+    $("practiceAnswerInput").value = "";
+    $("practiceFeedback").textContent = "Now solve it yourself and then check your answer.";
+    $("practiceWorked").innerHTML = "";
+    setStatus("practiceStatus","New question generated.","ok");
+  }catch(e){ setStatus("practiceStatus", e.message || String(e), "err"); }
+}
+async function checkPractice(){
+  if (!practiceCurrent){ setStatus("practiceStatus","Generate one question first.","err"); return; }
+  try{
+    const payload = Object.assign({}, practiceCurrent, {user_answer: $("practiceAnswerInput").value.trim()});
+    const data = await apiFetch("/practice/check", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify(payload)
+    });
+    $("practiceFeedback").textContent = data.feedback + " " + (data.encouragement || "");
+    renderSteps("practiceWorked", data.worked_steps || []);
+    setStatus("practiceStatus", data.correct ? "Correct answer. Great job." : "Answer checked. Read the worked solution below.", data.correct ? "ok" : "err");
+  }catch(e){ setStatus("practiceStatus", e.message || String(e), "err"); }
+}
+function initVoice(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR){ setStatus("solveStatus","Voice input is not supported in this browser.","err"); return; }
+  recognition = new SR();
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+  recognition.onresult = ev => {
+    const text = ev.results[0][0].transcript;
+    $("questionInput").value = text;
+    setStatus("solveStatus","Voice captured. Review the text and solve it.","ok");
+  };
+  recognition.onerror = () => setStatus("solveStatus","Could not capture voice input.","err");
+}
+document.addEventListener("DOMContentLoaded", () => {
+  setMode(false);
+  $("authBtn").onclick = doAuth;
+  $("toggleMode").onclick = () => setMode(true);
+  $("authPassword").addEventListener("input", e => $("meterFill").style.width = passwordScore(e.target.value) + "%");
+  $("solveBtn").onclick = solveQuestion;
+  $("clearBtn").onclick = () => { $("questionInput").value = ""; setStatus("solveStatus","","info"); };
+  $("refreshHistoryBtn").onclick = loadHistory;
+  $("clearHistoryBtn").onclick = clearHistory;
+  $("logoutBtn").onclick = logout;
+  $("generatePracticeBtn").onclick = generatePractice;
+  $("checkPracticeBtn").onclick = checkPractice;
+  $("voiceBtn").onclick = () => { if (!recognition) initVoice(); if (recognition) recognition.start(); };
+  $("stopVoiceBtn").onclick = () => { if (recognition) recognition.stop(); };
+  $("uploadInput").addEventListener("change", ev => {
+    const f = ev.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = e => { $("questionInput").value = String(e.target.result || "").trim(); setStatus("solveStatus","Question loaded from file.","ok"); };
+    reader.readAsText(f);
+  });
+
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      $("askTab").classList.toggle("hidden", tab.dataset.tab !== "ask");
+      $("practiceTab").classList.toggle("hidden", tab.dataset.tab !== "practice");
+      $("tipsTab").classList.toggle("hidden", tab.dataset.tab !== "tips");
+    });
+  });
+
+  document.querySelectorAll(".method").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".method").forEach(m => m.classList.remove("active"));
+      btn.classList.add("active");
+      const mode = btn.dataset.method;
+      $("typeArea").classList.toggle("hidden", mode !== "type");
+      $("voiceArea").classList.toggle("hidden", mode !== "voice");
+      $("uploadArea").classList.toggle("hidden", mode !== "upload");
+    });
+  });
+
+  if (localStorage.getItem(tokenKey) && localStorage.getItem(userKey)) openApp();
+});
+</script>
+</body>
+</html>
